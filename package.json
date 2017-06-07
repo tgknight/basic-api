@@ -1,7 +1,7 @@
 {
   "name": "basic-api",
   "version": "1.0.0",
-  "description": "Start point for implementing APIs",
+  "description": "Starting point for implementing APIs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"test\""
