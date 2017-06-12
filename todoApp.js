@@ -11,10 +11,11 @@ app.use(bodyParser.urlencoded({
 }));
 
 var taskList = []
-var stream = taskDB.createReadStream()
+
 
 //list
-app.get('/typeOftask/', function (req, res) {
+app.get('/typeOftask', function (req, res) {
+  var stream = taskDB.createReadStream()
     stream.on('data', function (all) {
       taskList.push(all)
     })
@@ -25,6 +26,7 @@ app.get('/typeOftask/', function (req, res) {
 
 //get
 app.get('/typeOftask/:type', function (req, res) {
+  var stream = taskDB.createReadStream()
     stream.on('data', function (all) {
     })
     stream.on('close', function () {
@@ -35,10 +37,15 @@ app.get('/typeOftask/:type', function (req, res) {
 })
 
 //post
-app.post('/typeOftask/', function (req, res) {
+app.post('/typeOftask', function (req, res) {
     var json = req.body
-    taskDB.put(json.typeOf, { id: json.id, description: json.description, completed: json.completed, duration: json.duration }, function (err) {
-      res.send('Add new ' + json.typeOf + json.id + ' Completed!')
+    taskDB.put(json.typeOf,
+      { id: json.id,
+        description: json.description,
+        completed: json.completed,
+        duration: json.duration },
+      function (err) {
+      taskDB.get(json.typeOf,function(err,ans){res.send(ans)})
     })
 })
 
@@ -46,8 +53,13 @@ app.post('/typeOftask/', function (req, res) {
 app.post('/typeOftask/:type', function (req, res) {
   taskDB.get(req.params.type,function(err,ans){
     var json = req.body
-    taskDB.put(json.typeOf, { id: json.id, description: json.description, completed: json.completed, duration: json.duration }, function (err) {
-      res.send('Add new ' + json.typeOf + json.id + ' Completed!')
+    taskDB.put(json.typeOf,
+      { id: json.id,
+        description: json.description,
+        completed: json.completed,
+        duration: json.duration },
+      function (err) {
+        taskDB.get(req.params.type,function(err,ans){res.send(ans)})
     })
   })
 })
@@ -56,7 +68,7 @@ app.post('/typeOftask/:type', function (req, res) {
 app.delete('/typeOftask/:typeOf', function (req, res) {
     var json = req.body
     taskDB.del(req.params.typeOf, function(err){
-      res.send('Delete ' + req.params.typeOf + ' Completed!');
+      taskDB.get(req.params.type,function(err,ans){res.send(ans)})
     })
 })
 
