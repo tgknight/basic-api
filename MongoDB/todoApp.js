@@ -21,11 +21,10 @@ MongoClient.connect(url, function(err, database){
 //insert
 app.post('/task', function(req, res){
   var json = req.body;
-  var doc = {'ID':json.id,
+  var doc = {'ID':parseInt(json.id),
              'Description':json.Description,
              'Completed':json.Completed,
              'Duration':json.Duration};
-
     db.collection('task').insert(doc, {w:1}, function(err, result){
     res.send(result);
   });
@@ -33,7 +32,7 @@ app.post('/task', function(req, res){
 
 app.post('/work', function(req, res){
   var json = req.body;
-  var doc = {'ID':json.id,
+  var doc = {'ID':parseInt(json.id),
              'Description':json.Description,
              'Completed':json.Completed,
              'Duration':json.Duration};
@@ -73,33 +72,38 @@ app.get('/work/:id', function(req, res){
 
 //delete
 app.delete('/task/:id', function(req, res) {
-  var myquery = { ID: parseInt(req.params.id) };
-  db.collection('task').remove(myquery, function(err, obj) {
-      res.send(obj.result.n + " document(s) deleted");
+  var myquery = { ID: parseInt(req.params.id)};
+  db.collection('task').remove(myquery, function(err, docs) {
+    db.collection('task').find(myquery).toArray(function(err, docs){
+        res.send(docs);
+    });
   });
 });
 app.delete('/work/:id', function(req, res) {
-  var myquery = { ID: parseInt(req.params.id) };
-  db.collection('work').remove(myquery, function(err, obj) {
-      res.send(obj.result.n + " document(s) deleted");
+  var myquery = { ID: parseInt(req.params.id)};
+  db.collection('work').remove(myquery, function(err, docs) {
+    db.collection('work').find(myquery).toArray(function(err, docs){
+        res.send(docs);
+    });
   });
 });
-
 
 //update
-app.patch('/task/:oldid/:newid', function(req, res){
-  var json = req.body;
-  var myquery = { ID: req.params.oldid };
-  var newvalues = { $set: { ID: req.params.newid } };
-  db.collection('task').update(myquery, newvalues, function(err, obj) {
-      res.send(obj.result.n + " record updated");
+app.patch('/task/:id/:description', function(req, res){
+  var myquery = { ID: parseInt(req.params.id)};
+  var newquery = {$set: {Description: req.params.description}}
+  db.collection('task').findOneAndUpdate(myquery,newquery,{upsert: true},function(err,docs){
+      db.collection('task').find(myquery).toArray(function(err, docs){
+          res.send(docs);
+      });
   });
 });
-app.patch('/work/:oldid/:newid', function(req, res){
-  var json = req.body;
-  var myquery = { ID: req.params.oldid };
-  var newvalues = { $set: { ID: req.params.newid } };
-  db.collection('work').update(myquery, newvalues, function(err, obj) {
-      res.send(obj.result.n + " record updated");
+app.patch('/work/:id/:description', function(req, res){
+  var myquery = { ID: parseInt(req.params.id)};
+  var newquery = {$set: {Description: req.params.description}}
+  db.collection('work').findOneAndUpdate(myquery,newquery,{upsert: true},function(err,docs){
+      db.collection('work').find(myquery).toArray(function(err, docs){
+          res.send(docs);
+      });
   });
 });
