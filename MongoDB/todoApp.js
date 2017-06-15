@@ -19,7 +19,7 @@ MongoClient.connect(url, function(err, database){
 });
 
 //insert
-app.post('/insertTask', function(req, res){
+app.post('/task', function(req, res){
   var json = req.body;
   var doc = {'ID':json.id,
              'Description':json.Description,
@@ -31,7 +31,7 @@ app.post('/insertTask', function(req, res){
   });
 });
 
-app.post('/insertWork', function(req, res){
+app.post('/work', function(req, res){
   var json = req.body;
   var doc = {'ID':json.id,
              'Description':json.Description,
@@ -44,13 +44,13 @@ app.post('/insertWork', function(req, res){
 });
 
 //list
-app.get('/readTask', function(req, res){
+app.get('/task', function(req, res){
     db.collection('task').find().toArray(function(err, docs){
         res.send(docs);
     });
 });
 
-app.get('/readWork', function(req, res){
+app.get('/work', function(req, res){
     db.collection('work').find().toArray(function(err, docs){
         res.send(docs);
     });
@@ -58,28 +58,28 @@ app.get('/readWork', function(req, res){
 
 
 //get
-app.get('/readTask/:id', function(req, res){
-    var query = { ID: req.params.id };
+app.get('/task/:id', function(req, res){
+    var query = { ID: parseInt(req.params.id)};
     db.collection('task').find(query).toArray(function(err, docs){
         res.send(docs);
       });
 });
-app.get('/readWork/:id', function(req, res){
-    var query = { ID: req.params.id };
+app.get('/work/:id', function(req, res){
+    var query = { ID: parseInt(req.params.id)};
     db.collection('work').find(query).toArray(function(err, docs){
         res.send(docs);
       });
 });
 
 //delete
-app.delete('/deleteTask/:id', function(req, res) {
-  var myquery = { ID: req.params.id };
+app.delete('/task/:id', function(req, res) {
+  var myquery = { ID: parseInt(req.params.id) };
   db.collection('task').remove(myquery, function(err, obj) {
       res.send(obj.result.n + " document(s) deleted");
   });
 });
-app.delete('/deleteWork/:id', function(req, res) {
-  var myquery = { ID: req.params.id };
+app.delete('/work/:id', function(req, res) {
+  var myquery = { ID: parseInt(req.params.id) };
   db.collection('work').remove(myquery, function(err, obj) {
       res.send(obj.result.n + " document(s) deleted");
   });
@@ -87,7 +87,7 @@ app.delete('/deleteWork/:id', function(req, res) {
 
 
 //update
-app.patch('/updateTask/:oldid/:newid', function(req, res){
+app.patch('/task/:oldid/:newid', function(req, res){
   var json = req.body;
   var myquery = { ID: req.params.oldid };
   var newvalues = { $set: { ID: req.params.newid } };
@@ -95,7 +95,7 @@ app.patch('/updateTask/:oldid/:newid', function(req, res){
       res.send(obj.result.n + " record updated");
   });
 });
-app.patch('/updateWork/:oldid/:newid', function(req, res){
+app.patch('/work/:oldid/:newid', function(req, res){
   var json = req.body;
   var myquery = { ID: req.params.oldid };
   var newvalues = { $set: { ID: req.params.newid } };
