@@ -56,9 +56,7 @@ deleteDocuments: function(req, res, urlx) {
     else {
     var myquery = { ID: parseInt(req.params.id)};
     db.collection(urlx).remove(myquery, function(err, docs){
-      db.collection(urlx).findOne(myquery,function(err, docs){
         res.send(docs,204);
-      });
     });
   }
 },

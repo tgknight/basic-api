@@ -1,17 +1,6 @@
-module.exports = (function() {
-
-var express = require('express');
-var bodyParser = require('body-parser');
 
 var task = require('./routes/task');
 var work = require('./routes/work');
-
-var Router = express.Router();
-var app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true}));
 
 const data = {
   //task
@@ -68,9 +57,4 @@ const data = {
   }
 }
 
-for (let func in data) {
-  Router[data[func].action](data[func].path, data[func].method)
-}
-
-return Router;
-})();
+exports.data = data;

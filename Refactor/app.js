@@ -14,5 +14,9 @@ MongoClient.connect(url, function(err, database){
   exports.db = db;
 });
 
-app.use(require('./config'))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true}));
+
+app.use(require('./route'))
 app.listen(8082);
