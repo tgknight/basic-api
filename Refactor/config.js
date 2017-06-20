@@ -7,6 +7,11 @@ var task = require('./routes/task');
 var work = require('./routes/work');
 
 var Router = express.Router();
+var app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true}));
 
 const data = {
   //task
