@@ -70,5 +70,5 @@ for (let func in data) {
 }
 
 
-app.use('/test', Router)
+app.use('/', Router)
 app.listen(8082);
