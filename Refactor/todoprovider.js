@@ -1,43 +1,40 @@
 var MiddleWare = require('./middleware');
-var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://'+process.env.MONGO_PORT_27017_TCP_ADDR+':'+process.env.MONGO_PORT_27017_TCP_PORT+'/blog';
-var db;
+var app = require('./app')
 
-MongoClient.connect(url, function(err, database){
-  if(err){console.log('failed to connect: ' + err); return;}
-  db = database;
-});
-
+module.exports = {
 //insert
-var insertDocuments = function(req, res, urlx) {
+insertDocuments: function(req, res, urlx) {
   var json = req.body;
+  var db = app.db;
   var doc = { 'ID':parseInt(json.id),
               'Description':json.Description,
               'Completed':json.Completed,
               'Duration':json.Duration};
-  if(json.id == null || json.id == '' || MiddleWare.checkInput(req, res, json) == false) {
+  if( json.id == null ||
+      json.id == '' ||
+      MiddleWare.checkInput(req, res, json) == false){
     res.send('Something wrong???', 400);}
   else {
     db.collection(urlx).insert(doc, {w:1}, function(err, result){
-      db.collection(urlx).findOne({ ID: parseInt(json.id)},function(err, docs){
-        res.send(docs,201);
-      });
+        res.send(result.ops[0],201);
     });
   }
-}
+},
 
 //list
-var listDocuments = function(req, res, urlx) {
+listDocuments: function(req, res, urlx) {
+  var db = app.db;
   db.collection(urlx).find().toArray(function(err, docs){
-    if(MiddleWare.checkResult(req, res, docs) == true) {
+    if(MiddleWare.checkResult(req, res, docs) == false) {
       res.send('Not found :-(', 404);}
     else {
       res.send(docs);}
   });
-}
+},
 
 //get
-var getDocuments = function(req, res, urlx) {
+getDocuments: function(req, res, urlx) {
+  var db = app.db;
   if(MiddleWare.checkNum(req, res) == false) {
     res.send('Wrong Input!!! (Maybe it is not number)', 400);}
   else {
@@ -49,10 +46,11 @@ var getDocuments = function(req, res, urlx) {
         res.send(docs);}
     });
   }
-}
+},
 
 //delete
-var deleteDocuments = function(req, res, urlx) {
+deleteDocuments: function(req, res, urlx) {
+    var db = app.db;
     if(MiddleWare.checkNum(req, res) == false) {
       res.send('Wrong Input!!! (Maybe it is not number)', 400);}
     else {
@@ -63,13 +61,13 @@ var deleteDocuments = function(req, res, urlx) {
       });
     });
   }
-}
+},
 
 //update
-var updateDocuments = function(req, res, urlx) {
+updateDocuments: function(req, res, urlx) {
+  var db = app.db;
   var json = req.body;
-  if(MiddleWare.checkNum(req, res) == false) {
-    res.send('Wrong Input!!! (Maybe it is not number)', 400);}
+  if(MiddleWare.checkNum(req, res) == false) {res.send('Wrong Input!!! (Maybe it is not number)', 400);}
   else {
     var myquery = { ID: parseInt(req.params.id)};
     var newquery = {$set: { Description: json.Description,
@@ -79,14 +77,9 @@ var updateDocuments = function(req, res, urlx) {
         res.send('Something wrong???', 400);}
       else {
         db.collection(urlx).findOneAndUpdate(myquery,newquery,{returnOriginal:false},function(err,docs){
-          res.send(docs);
+          res.send(docs.value);
         });
       }
     }
 }
-
-module.exports.insertDocuments = insertDocuments;
-module.exports.listDocuments = listDocuments;
-module.exports.getDocuments = getDocuments;
-module.exports.deleteDocuments = deleteDocuments;
-module.exports.updateDocuments = updateDocuments;
+}

@@ -1,74 +1,22 @@
 var express = require('express');
-var MiddleWare = require('./middleware');
 var bodyParser = require('body-parser');
-var task = require('./routes/task');
-var work = require('./routes/work');
-var Router = express.Router();
+var MongoClient = require('mongodb').MongoClient;
+
+var MiddleWare = require('./middleware');
+
 var app = express();
+var url = 'mongodb://'+process.env.MONGO_PORT_27017_TCP_ADDR+':'+process.env.MONGO_PORT_27017_TCP_PORT+'/blog';
+var db;
+
+MongoClient.connect(url, function(err, database){
+  if(err){console.log('failed to connect: ' + err); return;}
+  db = database;
+  exports.db = db;
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true}));
 
-const data = {
-  //task
-  taskGet: {
-    path: '/task/:id',
-    method: task.get,
-    action: 'get'
-  },
-  taskList: {
-    path: '/task',
-    method: task.list,
-    action: 'get'
-  },
-  taskInsert: {
-    path: '/task',
-    method: task.post,
-    action: 'post'
-  },
-  taskDelete: {
-    path: '/task/:id',
-    method: task.delete,
-    action: 'delete'
-  },
-  taskUpdate: {
-    path: '/task/:id',
-    method: task.patch,
-    action: 'patch'
-  },
-  //work
-  workGet: {
-    path: '/work/:id',
-    method: work.get,
-    action: 'get'
-  },
-  workList: {
-    path: '/work',
-    method: work.list,
-    action: 'get'
-  },
-  workInsert: {
-    path: '/work',
-    method: work.post,
-    action: 'post'
-  },
-  workDelete: {
-    path: '/work/:id',
-    method: work.delete,
-    action: 'delete'
-  },
-  workUpdate: {
-    path: '/work/:id',
-    method: work.patch,
-    action: 'patch'
-  }
-}
-
-for (let func in data) {
-  Router[data[func].action](data[func].path, data[func].method)
-}
-
-
-app.use('/', Router)
+app.use(require('./config'))
 app.listen(8082);
